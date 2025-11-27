@@ -7,12 +7,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* BASE STYLES */
         body { font-family: 'Inter', sans-serif; background-color: #0a0a0a; color: #e5e5e5; overflow-x: hidden; }
         .font-mono { font-family: 'JetBrains Mono', monospace; }
         .cyber-green { color: #00ff41; }
-        .hero-glow { position: relative; z-index: 10; } /* Ensure text is above the halo */
+        .hero-glow { position: relative; z-index: 10; } 
         
-        /* HALO EFFECT CSS */
+        /* HALO EFFECT CSS - CREATES THE MOVING ILLUSION */
         .halo-mesh {
             position: absolute;
             top: 50%;
@@ -24,7 +25,7 @@
             opacity: 0.5;
             animation: pulse 10s infinite ease-in-out;
             pointer-events: none;
-            z-index: 1; /* Ensure halo is behind text */
+            z-index: 1; /* Puts the halo behind the text */
         }
 
         @keyframes pulse {
