@@ -3,110 +3,359 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SilentMesh | The Invisible Defense Layer</title>
+    <title>SilentMesh // Architect: Mayur Agarwal</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* BASE STYLES */
-        body { font-family: 'Inter', sans-serif; background-color: #0a0a0a; color: #e5e5e5; overflow-x: hidden; }
-        .font-mono { font-family: 'JetBrains Mono', monospace; }
-        .cyber-green { color: #00ff41; }
-        .hero-glow { position: relative; z-index: 10; } 
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@200;400;600;800&display=swap');
         
-        /* HALO EFFECT CSS - CREATES THE MOVING ILLUSION */
-        .halo-mesh {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 100vw;
-            height: 100vh;
-            background: radial-gradient(circle at center, rgba(0, 255, 65, 0.1) 0%, rgba(0, 0, 0, 0) 60%);
-            transform: translate(-50%, -50%) scale(1.5);
-            opacity: 0.5;
-            animation: pulse 10s infinite ease-in-out;
-            pointer-events: none;
-            z-index: 1; /* Puts the halo behind the text */
+        :root {
+            --blue: #3b82f6;
+            --emerald: #10b981;
+            --bg: #020617;
         }
 
-        @keyframes pulse {
-            0% { transform: translate(-50%, -50%) scale(1.5); opacity: 0.3; }
-            50% { transform: translate(-50%, -50%) scale(1.6); opacity: 0.6; }
-            100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0.3; }
+        body {
+            background-color: var(--bg);
+            color: #f8fafc;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Fractal Grid Background */
+        .fractal-bg {
+            background-image: radial-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+            mask-image: radial-gradient(circle at center, black, transparent 80%);
+        }
+
+        /* Scanning Line Animation */
+        .scanline {
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(to bottom, transparent, rgba(59, 130, 246, 0.05), transparent);
+            position: fixed;
+            top: -100px;
+            left: 0;
+            z-index: 50;
+            pointer-events: none;
+            animation: scanning 8s linear infinite;
+        }
+        @keyframes scanning {
+            0% { transform: translateY(0vh); }
+            100% { transform: translateY(110vh); }
+        }
+
+        /* Logic Card Styling */
+        .logic-card {
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .logic-card:hover {
+            border-color: var(--blue);
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.1);
+        }
+
+        .reveal { opacity: 0; transform: translateY(40px); transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* Story Text Gradient */
+        .story-gradient {
+            background: linear-gradient(180deg, #fff 30%, rgba(255,255,255,0.2) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .terminal-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--emerald);
+            width: 100%;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Access Granted Transition */
+        #authResult {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #authResult.visible {
+            max-height: 500px;
+            opacity: 1;
+            margin-top: 2rem;
         }
     </style>
 </head>
-<body class="antialiased">
+<body class="selection:bg-blue-500/30">
 
-    <nav class="flex justify-between items-center p-6 max-w-6xl mx-auto">
-        <div class="text-2xl font-bold tracking-tighter">Silent<span class="cyber-green">Mesh</span></div>
-        <a href="mailto:mayur311agarwal@gmail.com?subject=Inquiry%20from%20SilentMesh.io%20Website&body=Hi%20Mayur%2C%0A%0AI%20am%20interested%20in%20discussing%20SilentMesh%20for%20our%20enterprise%20needs.%20Please%20schedule%20a%20call.%0A%0ACompany%3A%20%0ARole%3A" class="text-sm font-mono hover:text-green-400">Contact Sales -></a>
-    </nav>
+    <!-- 1. Interactive Intro Overlay -->
+    <div id="intro-overlay" class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center p-6 text-center transition-opacity duration-1000">
+        <div class="mono text-blue-500 mb-6 tracking-[0.4em] text-xs uppercase animate-pulse">
+            [ INITIALIZING_SECURE_VAULT ]
+        </div>
+        <div id="loading-text" class="text-3xl md:text-5xl font-extrabold tracking-tighter mb-12 max-w-2xl leading-tight">
+            THE WORLD'S SECURITY IS BUILT ON <span class="text-red-500 font-black italic">GUESSES.</span>
+        </div>
+        <button onclick="enterSite()" class="px-10 py-4 border border-blue-500/30 text-blue-500 font-bold text-xs uppercase tracking-[0.3em] hover:bg-blue-500 hover:text-white transition-all duration-500">
+            Reveal the Truth
+        </button>
+    </div>
 
-    <header class="mt-20 text-center max-w-4xl mx-auto px-4 hero-glow">
-        <div class="halo-mesh"></div> 
+    <!-- Main Content -->
+    <div class="relative min-h-screen">
+        <div class="fixed inset-0 fractal-bg -z-10"></div>
+        <div class="scanline"></div>
+
+        <!-- Navigation -->
+        <nav class="fixed w-full z-50 p-8 flex justify-between items-center transition-all duration-500" id="navbar">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center font-bold text-sm shadow-[0_0_15px_rgba(37,99,235,0.4)]">S</div>
+                <span class="font-extrabold tracking-tighter text-xl uppercase">SilentMesh</span>
+            </div>
+            <div class="hidden md:flex gap-10 text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500">
+                <a href="#narrative" class="hover:text-blue-500 transition">The_Narrative</a>
+                <a href="#logic" class="hover:text-blue-500 transition">Deterministic_Grid</a>
+                <a href="#contact" class="text-blue-500 border-b border-blue-500/20">Sovereign_Handshake</a>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <header class="min-h-screen flex flex-col justify-center items-center text-center px-6 pt-20">
+            <div class="reveal">
+                <h1 class="text-7xl md:text-[150px] font-black tracking-tighter leading-[0.85] mb-12 uppercase">
+                    DEFENSE BY <br> <span class="text-blue-600">DETERMINISM.</span>
+                </h1>
+                <p class="max-w-2xl mx-auto text-slate-400 text-lg md:text-xl font-light leading-relaxed mb-12">
+                    Replacing probabilistic noise with 100% signal. <br>
+                    Securing the global financial interior through fractal immunity.
+                </p>
+                <div class="flex flex-col md:flex-row gap-6 justify-center">
+                    <a href="#narrative" class="px-10 py-4 bg-white text-black font-bold uppercase text-[10px] tracking-[0.2em] hover:bg-blue-600 hover:text-white transition-all duration-500">The Architect's Story</a>
+                    <div class="px-10 py-4 border border-white/10 text-slate-500 font-bold uppercase text-[10px] tracking-[0.2em] mono">
+                        Node: AWS-TRAPNET-PRD-01
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Section: The Narrative (Architect's Story) -->
+        <section id="narrative" class="py-60 px-6">
+            <div class="max-w-5xl mx-auto">
+                <div class="reveal mb-32">
+                    <span class="mono text-blue-500 text-xs font-bold uppercase mb-6 block tracking-[0.4em]">01 // The Observation</span>
+                    <h2 class="text-5xl md:text-7xl font-bold mb-12 tracking-tighter story-gradient leading-tight">
+                        The industry accepted <br> failure as a metric.
+                    </h2>
+                    <p class="text-2xl md:text-3xl text-slate-400 font-light leading-relaxed">
+                        In 2024, Mayur Agarwal looked at the $100 Trillion banking grid and found a fatal silence. 212 days of dwell time. Millions spent on firewalls that attackers simply walk past.
+                    </p>
+                </div>
+
+                <div class="reveal mb-32 md:ml-20">
+                    <span class="mono text-blue-500 text-xs font-bold uppercase mb-6 block tracking-[0.4em]">02 // The Realization</span>
+                    <h2 class="text-5xl md:text-7xl font-bold mb-12 tracking-tighter story-gradient leading-tight">
+                        The interior <br> was too predictable.
+                    </h2>
+                    <p class="text-2xl md:text-3xl text-slate-400 font-light leading-relaxed">
+                        Security was built on "guessing" malicious intent from mountains of logs. To stop an attacker, you must stop guessing. You must force the interior to become non-deterministic.
+                    </p>
+                </div>
+
+                <div class="reveal">
+                    <span class="mono text-blue-500 text-xs font-bold uppercase mb-6 block tracking-[0.4em]">03 // The Invention</span>
+                    <h2 class="text-5xl md:text-7xl font-bold mb-12 tracking-tighter story-gradient leading-tight">
+                        Engineering <br> the Fractal Moat.
+                    </h2>
+                    <p class="text-2xl md:text-3xl text-slate-400 font-light leading-relaxed mb-16">
+                        Mayur engineered the **Vyuha Engine**—a self-healing grid of containerized decoys that mimic institutional protocols (SWIFT, SQL, API) with perfect fidelity. A minefield where interaction equals verified malicious intent.
+                    </p>
+                    
+                    <div class="flex items-center gap-8 mt-20 p-8 logic-card rounded-2xl max-w-xl">
+                        <div class="w-20 h-20 rounded-full bg-blue-600/10 border border-blue-500/20 flex items-center justify-center overflow-hidden">
+                            <span class="text-3xl font-bold text-blue-500">M</span>
+                        </div>
+                        <div>
+                            <p class="font-extrabold text-2xl tracking-tight">Mayur Agarwal</p>
+                            <p class="text-xs text-slate-500 uppercase tracking-[0.3em] font-bold">Architect // Founder & CTO</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Deterministic Grid (Technical) -->
+        <section id="logic" class="py-40 bg-slate-950/40 border-y border-white/5 px-6">
+            <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-24 items-center">
+                <div class="reveal">
+                    <span class="mono text-blue-500 text-xs font-bold uppercase mb-6 block tracking-[0.4em]">Technical Loadout</span>
+                    <h3 class="text-4xl md:text-6xl font-black mb-10 tracking-tighter uppercase">Sovereign <br> Orchestration</h3>
+                    <p class="text-slate-400 text-xl leading-relaxed mb-12">
+                        SilentMesh is not a patch; it is a structural evolution. Our grid is designed for the BFSI sector, ensuring PII metadata never leaves the perimeter while delivering zero-noise alerts.
+                    </p>
+                    <div class="grid grid-cols-2 gap-8">
+                        <div>
+                            <p class="text-white font-bold mb-2">Deterministic</p>
+                            <p class="text-sm text-slate-500">100% Signal fidelity. Interaction = Threat.</p>
+                        </div>
+                        <div>
+                            <p class="text-white font-bold mb-2">Non-Deterministic</p>
+                            <p class="text-sm text-slate-500">Decoys rotate identity via Vyuha AI.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="reveal logic-card p-2 rounded-3xl overflow-hidden">
+                    <div class="bg-black rounded-2xl p-8 h-[450px] overflow-hidden mono text-[11px] leading-relaxed relative">
+                        <div class="absolute top-0 left-0 w-full h-8 bg-slate-900 flex items-center px-4 gap-2">
+                            <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                            <div class="w-2 h-2 rounded-full bg-amber-500"></div>
+                            <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+                            <span class="text-[9px] text-slate-600 ml-4">VYUHA_LOG_VIEWER</span>
+                        </div>
+                        <div id="terminal-stream" class="mt-8 space-y-1">
+                            <!-- Logs will stream here via JS -->
+                        </div>
+                        <div class="absolute bottom-8 left-8 text-emerald-500 animate-pulse">_</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: The Handshake (Contact) -->
+        <section id="contact" class="py-60 px-6 text-center">
+            <div class="reveal max-w-2xl mx-auto">
+                <span class="mono text-blue-500 text-xs font-bold uppercase mb-8 block tracking-[0.5em]">03 // Final Handshake</span>
+                <h2 class="text-5xl md:text-7xl font-black mb-12 tracking-tighter uppercase leading-none">Authenticate <br> Access.</h2>
+                <p class="text-slate-500 text-sm mb-16 tracking-widest uppercase">Prove intent to reveal the Architect's Credentials</p>
+                
+                <div class="logic-card p-10 rounded-3xl text-left mono text-sm relative overflow-hidden">
+                    <div class="flex items-center gap-3 mb-8">
+                        <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                        <span class="text-slate-600 text-[10px] tracking-[0.2em] uppercase font-bold">Vyuha Gateway // prd-tunnel-01</span>
+                    </div>
+                    <div class="text-emerald-500/80 mb-4">system@silentmesh:~$ <span class="text-slate-400">Type 'request_access'</span></div>
+                    <div class="flex items-center gap-3 border-b border-white/5 pb-2">
+                        <span class="text-emerald-500 font-bold">></span>
+                        <input type="text" id="terminalInput" class="terminal-input" placeholder="..." autocomplete="off">
+                    </div>
+                    
+                    <div id="authResult">
+                        <div class="p-6 bg-blue-600/10 border border-blue-500/20 rounded-xl">
+                            <p class="text-blue-500 font-bold mb-4">[ IDENTITY_VERIFIED ]</p>
+                            <div class="space-y-4 text-slate-300">
+                                <div class="flex justify-between border-b border-white/5 pb-2 items-center">
+                                    <span class="text-slate-500 uppercase text-[10px]">Official Mail</span>
+                                    <a href="mailto:founder@silentmesh.me" class="text-white hover:text-blue-400 transition">founder@silentmesh.me</a>
+                                </div>
+                                <div class="flex justify-between border-b border-white/5 pb-2 items-center">
+                                    <span class="text-slate-500 uppercase text-[10px]">Intellectual Hub</span>
+                                    <a href="https://linkedin.com/in/mayur-agarwal" target="_blank" class="text-white hover:text-blue-400 transition">linkedin.com/mayur-agarwal</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="py-20 border-t border-white/5 text-center">
+            <div class="flex items-center justify-center gap-4 mb-8">
+                <div class="w-6 h-6 bg-blue-600 rounded flex items-center justify-center font-bold text-[10px]">S</div>
+                <span class="font-black text-sm tracking-widest uppercase">SilentMesh</span>
+            </div>
+            <p class="text-[9px] text-slate-700 font-bold uppercase tracking-[0.6em] mb-4">
+                Sir MVIT Scrutiny Phase // Founding Team // © 2025
+            </p>
+            <div class="text-[8px] text-slate-800 uppercase mono">Sovereign Data Storage | Fractal Orchestration | Deterministic ROI</div>
+        </footer>
+    </div>
+
+    <script>
+        // Intro Overlay Escape
+        function enterSite() {
+            const overlay = document.getElementById('intro-overlay');
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                document.querySelector('.reveal').classList.add('active');
+            }, 1000);
+            startTerminal();
+        }
+
+        // Terminal Cryptographic Handshake
+        const terminalInput = document.getElementById('terminalInput');
+        const authResult = document.getElementById('authResult');
+
+        terminalInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const val = terminalInput.value.toLowerCase().trim();
+                if (val === 'request_access') {
+                    authResult.classList.add('visible');
+                    terminalInput.value = 'ACCESS_GRANTED';
+                    terminalInput.disabled = true;
+                    terminalInput.classList.add('text-blue-500');
+                } else {
+                    terminalInput.value = '';
+                }
+            }
+        });
+
+        // Terminal Log Simulation
+        const stream = document.getElementById('terminal-stream');
+        const logs = [
+            { t: "[INIT] SilentMesh Node AWS-TRAPNET-01 initialized.", c: "text-slate-500" },
+            { t: "[GRID] Deploying SWIFT-ISO20022 Ghost Cluster.", c: "text-slate-500" },
+            { t: "[STATUS] Fractal parity sync: 100%", c: "text-emerald-500" },
+            { t: "[DETECT] Port sweep identified on Port 1433.", c: "text-amber-500" },
+            { t: "[DETERMINISTIC] Interaction confirmed. No noise detected.", c: "text-blue-400 font-bold" },
+            { t: "[ACTION] Isolation layer active. Shunting to virtual subnet.", c: "text-red-500" },
+            { t: "[SYSTEM] Node reset successful. Monitoring drift...", c: "text-slate-600" }
+        ];
+
+        function startTerminal() {
+            let i = 0;
+            setInterval(() => {
+                const line = document.createElement('div');
+                line.className = logs[i % logs.length].c;
+                line.innerText = `[${new Date().toLocaleTimeString('en-US', { hour12: false })}] ` + logs[i % logs.length].t;
+                stream.prepend(line);
+                if (stream.children.length > 20) stream.lastChild.remove();
+                i++;
+            }, 2500);
+        }
+
+        // Intersection Observer for Reveal Animations
+        const reveals = document.querySelectorAll('.reveal');
+        const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
         
-        <div class="relative z-20"> <div class="inline-block px-3 py-1 mb-4 text-xs font-mono border border-green-900 text-green-500 rounded-full bg-green-900/10">
-                🟢 TRL-7 PROTOTYPE LIVE ON AWS
-            </div>
-            <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-6">
-                The Defense They <br><span class="cyber-green">Never See.</span>
-            </h1>
-            <p class="text-xl text-gray-400 max-w-2xl mx-auto mb-10">
-                An indigenous deception grid that catches UPI fraud bots and lateral movement 
-                before they reach your production data.
-            </p>
-            <div class="flex justify-center gap-4">
-                <a href="mailto:mayur311agarwal@gmail.com?subject=Live%20Pilot%20Request%3A%20SilentMesh%20for%20Critical%20Infra&body=Hi%20Mayur%2C%0A%0AI%20would%20like%20to%20schedule%20a%20pilot%20of%20SilentMesh%20for%20our%20organization.%20Please%20send%20us%20the%20NDA%20and%20next%20steps.%0A%0ACompany%3A%20%0ARole%3A%0A%0APain%20Point%20(Optional)%3A" class="bg-green-600 hover:bg-green-500 text-black font-bold py-3 px-8 rounded transition">
-                    Request Pilot
-                </a>
-                <button class="border border-gray-600 hover:border-gray-400 text-white py-3 px-8 rounded transition font-mono">
-                    $ ssh trap@silentmesh.io
-                </button>
-            </div>
-            <p class="mt-4 text-xs text-gray-500 font-mono">
-                *The 'ssh trap' button is a visual command representation, designed for aesthetic and security purposes.*
-            </p>
-        </div>
-    </header>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
 
-    <section class="mt-24 max-w-4xl mx-auto px-4">
-        <div class="bg-gray-900 rounded-lg border border-gray-800 p-4 shadow-2xl hero-glow font-mono text-sm">
-            <div class="flex gap-2 mb-4">
-                <div class="w-3 h-3 rounded-full bg-red-500"></div>
-                <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-                <div class="w-3 h-3 rounded-full bg-green-500"></div>
-            </div>
-            <div class="space-y-2">
-                <p><span class="text-green-400">➜</span> <span class="text-blue-400">~</span> curl -X POST api.silentmesh.io/v1/validate_vpa</p>
-                <p class="text-gray-400">{ "status": "error", "message": "Rate limit exceeded" }</p>
-                <p class="text-gray-500 animate-pulse">... [SilentMesh] Threat Detected: API Enumeration</p>
-                <p class="text-gray-500">... [Brahmastra] Intent Analysis: Payment Fraud Reconnaissance</p>
-                <p class="text-green-400">➜ [Slack Alert Sent to CISO in 450ms]</p>
-            </div>
-        </div>
-    </section>
+        reveals.forEach(r => observer.observe(r));
 
-    <section class="py-24 mt-12 border-t border-gray-900">
-        <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-3 gap-12">
-            <div>
-                <h3 class="text-xl font-bold mb-3">Twin-Engine Stealth (Maricha)</h3>
-                <p class="text-gray-400">Lightweight, multi-vector decoys (SSH/API/SQL) that sit below the traditional EDR layer. *Zero performance impact on production systems*.</p>
-            </div>
-            <div>
-                <h3 class="text-xl font-bold mb-3">Brahmastra AI Core</h3>
-                <p class="text-gray-400">Our proprietary LLM engine transforms raw logs into a *human-readable narrative*. We identify attacker *intent* (e.g., VPA Enumeration) not just network port activity.</p>
-            </div>
-            <div>
-                <h3 class="text-xl font-bold mb-3">Sovereign Architecture</h3>
-                <p class="text-gray-400">Built in India (Sir MVIT research). Log data processed and stored within secure sovereign boundaries. DPDP Act compliant by design.</p>
-            </div>
-        </div>
-    </section>
-
-    <footer class="text-center py-12 text-gray-600 text-sm border-t border-gray-900">
-        <p>Built at Sir MVIT | Powered by Project Chakravyuh Research</p>
-        <p class="mt-2">© 2025 SilentMesh Security</p>
-    </footer>
-
+        // Sticky Navbar Effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                nav.classList.add('bg-slate-950/80', 'backdrop-blur-xl', 'py-4', 'border-b', 'border-white/5');
+                nav.classList.remove('py-8');
+            } else {
+                nav.classList.remove('bg-slate-950/80', 'backdrop-blur-xl', 'py-4', 'border-b', 'border-white/5');
+                nav.classList.add('py-8');
+            }
+        });
+    </script>
 </body>
 </html>
